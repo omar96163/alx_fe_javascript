@@ -33,3 +33,4 @@ function createAddQuoteForm() {
         alert('Please enter both the quote and category.');
     }
 }
+document.getElementById('newQuote').addEventListener('click', showRandomQuote);
