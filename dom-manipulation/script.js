@@ -1,22 +1,20 @@
-let quotes = [
-    { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "Motivation" },
-    { text: "Life is what happens when you're busy making other plans.", category: "Life" },
-    { text: "The purpose of our lives is to be happy.", category: "Happiness" },
-  ];
+let quotes = [];
 function showRandomQuote() {
+    const localQuat = JSON.parse(localStorage.getItem('quot'))
     const quoteDisplay = document.getElementById('quoteDisplay');
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    const randomQuote = quotes[randomIndex];
+    const randomIndex = Math.floor(Math.random() * localQuat.length);
+    const randomQuote = localQuat[randomIndex];
     quoteDisplay.innerHTML = `
         <p>${randomQuote.text}</p>
         <p>${randomQuote.category}</p>
-    `;
-  }
+    `
+}
 function createAddQuoteForm() {
     const newQuoteText = document.getElementById('newQuoteText').value;
     const newQuoteCategory = document.getElementById('newQuoteCategory').value;
     if (newQuoteText && newQuoteCategory) {
         quotes.push({ text: newQuoteText, category: newQuoteCategory });
+        localStorage.setItem('quot',JSON.stringify(quotes))
         const quoteDisplay = document.getElementById('quoteDisplay');
         quoteDisplay.innerHTML = '';
         const quoteTextElement = document.createElement('p');
@@ -34,3 +32,13 @@ function createAddQuoteForm() {
     }
 }
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
+function importFromJsonFile(event) {
+    const fileReader = new FileReader();
+    fileReader.onload = function(event) {
+      const importedQuotes = JSON.parse(event.target.result);
+      quotes.push(...importedQuotes);
+      saveQuotes();
+      alert('Quotes imported successfully!');
+    };
+    fileReader.readAsText(event.target.files[0]);
+  }
