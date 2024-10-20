@@ -1,3 +1,4 @@
+const API_URL = 'https://jsonplaceholder.typicode.com/posts';
 let quotes = [];
 function showRandomQuote() {
     const localQuotes = JSON.parse(localStorage.getItem('quot')) || [];
@@ -54,14 +55,11 @@ function filterQuotes() {
     const filteredQuotes = selectedCategory === 'all' ? quotes : quotes.filter(quote => quote.category === selectedCategory);
     const quoteDisplay = document.getElementById('quoteDisplay');
     quoteDisplay.innerHTML = '';
-
     filteredQuotes.forEach(quote => {
         const quoteTextElement = document.createElement('p');
         quoteTextElement.textContent = quote.text;
-
         const quoteCategoryElement = document.createElement('p');
         quoteCategoryElement.textContent = quote.category;
-
         quoteDisplay.appendChild(quoteTextElement);
         quoteDisplay.appendChild(quoteCategoryElement);
     });
@@ -89,9 +87,55 @@ function importFromJsonFile(event) {
     };
     fileReader.readAsText(event.target.files[0]);
 }
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        const quotesFromServer = data.map(post => ({
+            text: post.title,
+            category: 'general'
+        }));
+        syncQuotes(quotesFromServer);
+    } catch (error) {
+        console.error('Error fetching quotes from server:', error);
+    }
+}
+function syncQuotes(quotesFromServer) {
+    const localQuotes = JSON.parse(localStorage.getItem('quot')) || [];
+    const mergedQuotes = [...new Set([...localQuotes, ...quotesFromServer])];
+    const updatedQuotes = mergedQuotes.map((quote, index, self) => {
+        const found = self.find(q => q.text === quote.text);
+        if (found && found.category !== quote.category) {
+            return quote; 
+        }
+        return quote; 
+    });
+    localStorage.setItem('quot', JSON.stringify(updatedQuotes));
+    quotes = updatedQuotes;
+    updateQuoteDisplay();
+    notifyUser('Quotes have been updated from the server!');
+}
+function startQuoteSync() {
+    fetchQuotesFromServer();
+    setInterval(fetchQuotesFromServer, 60000);
+}
+function notifyUser(message) {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.top = '10px';
+    notification.style.right = '10px';
+    notification.style.backgroundColor = '#ffcc00';
+    notification.style.padding = '10px';
+    document.body.appendChild(notification);
+    setTimeout(() => {
+        document.body.removeChild(notification);
+    }, 3000);
+}
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 document.getElementById('exportQuotes').addEventListener('click', exportToJsonFile);
 window.onload = function() {
+    startQuoteSync();
     const localQuotes = JSON.parse(localStorage.getItem('quot')) || [];
     quotes = localQuotes;
     populateCategories();
