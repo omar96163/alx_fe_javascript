@@ -171,10 +171,11 @@ function syncQuotes(quotesFromServer) {
     const mergedQuotes = [...new Set([...localQuotes, ...quotesFromServer])];
 
     // التحقق من التعارضات
+    let hasConflict = false;
     const updatedQuotes = mergedQuotes.map((quote, index, self) => {
         const found = self.find(q => q.text === quote.text);
         if (found && found.category !== quote.category) {
-            // إذا كان هناك تعارض، نُعطي الأولوية لبيانات الخادم
+            hasConflict = true; // تعيين وجود تعارض
             return quote; // يتم استخدام اقتباس الخادم
         }
         return quote; // استخدام الاقتباس المحلي
@@ -183,16 +184,12 @@ function syncQuotes(quotesFromServer) {
     localStorage.setItem('quot', JSON.stringify(updatedQuotes));
     quotes = updatedQuotes; // تحديث المصفوفة المحلية
     updateQuoteDisplay(); // تحديث العرض
-    notifyUser('Quotes have been updated from the server!'); // إعلام المستخدم بالتحديث
+
+    // إعلام المستخدم بالتحديث
+    notifyUser(hasConflict ? 'Quotes have been updated from the server with conflicts!' : 'Quotes synced with server!');
 }
 
-// دالة لتحديث الاقتباسات بشكل دوري
-function startQuoteSync() {
-    fetchQuotesFromServer(); // جلب الاقتباسات من الخادم
-    setInterval(fetchQuotesFromServer, 60000); // تحديث كل دقيقة
-}
-
-// دالة للإعلام عن التحديثات
+// دالة لإعلام المستخدم بالتحديثات
 function notifyUser(message) {
     const notification = document.createElement('div');
     notification.textContent = message;
@@ -201,6 +198,8 @@ function notifyUser(message) {
     notification.style.right = '10px';
     notification.style.backgroundColor = '#ffcc00';
     notification.style.padding = '10px';
+    notification.style.borderRadius = '5px';
+    notification.style.zIndex = '1000'; // تأكد من أن الرسالة تكون فوق العناصر الأخرى
     document.body.appendChild(notification);
 
     setTimeout(() => {
@@ -216,11 +215,11 @@ document.getElementById('exportQuotes').addEventListener('click', exportToJsonFi
 
 // تحميل الاقتباسات من localStorage عند تحميل الصفحة
 window.onload = function() {
-    startQuoteSync();
     const localQuotes = JSON.parse(localStorage.getItem('quot')) || [];
     quotes = localQuotes; // تعيين الاقتباسات من localStorage
     populateCategories(); // ملء الفئات
     const lastSelectedCategory = localStorage.getItem('lastSelectedCategory') || 'all';
     document.getElementById('categoryFilter').value = lastSelectedCategory; // استعادة الفئة المحددة الأخيرة
     filterQuotes(); // تحديث العرض بناءً على الفئة المحددة
+    setInterval(fetchQuotesFromServer, 60000); // تحديث كل دقيقة
 };
