@@ -16,6 +16,9 @@
   </div>
   <button id="exportQuotes">Export Quotes as JSON</button>
   <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+  <select id="categoryFilter" onchange="filterQuotes()">
+    <option value="all">All Categories</option>
+  </select>
   <script src="script.js"></script>
 </body>
 </html>
