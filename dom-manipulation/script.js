@@ -7,7 +7,10 @@ function showRandomQuote() {
     const quoteDisplay = document.getElementById('quoteDisplay');
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const randomQuote = quotes[randomIndex];
-    quoteDisplay.innerHTML = `<p>${randomQuote.text}</p><p><em>${randomQuote.category}</em></p>`;
+    quoteDisplay.innerHTML = `
+        <p>${randomQuote.text}</p>
+        <p>${randomQuote.category}</p>
+    `;
   }
 function createAddQuoteForm() {
     const newQuoteText = document.getElementById('newQuoteText').value;
@@ -20,7 +23,6 @@ function createAddQuoteForm() {
         quoteTextElement.textContent = newQuoteText;
         const quoteCategoryElement = document.createElement('p');
         quoteCategoryElement.textContent = newQuoteCategory;
-        quoteCategoryElement.style.fontStyle = 'italic';
         quoteDisplay.appendChild(quoteTextElement);
         quoteDisplay.appendChild(quoteCategoryElement);
         document.getElementById('newQuoteText').value = '';
@@ -31,4 +33,3 @@ function createAddQuoteForm() {
         alert('Please enter both the quote and category.');
     }
 }
-document.getElementById('newQuote').addEventListener('click', showRandomQuote);
