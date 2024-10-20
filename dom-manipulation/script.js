@@ -9,7 +9,7 @@ function showRandomQuote() {
     const randomQuote = quotes[randomIndex];
     quoteDisplay.innerHTML = `<p>${randomQuote.text}</p><p><em>${randomQuote.category}</em></p>`;
   }
-function addQuote() {
+function createAddQuoteForm() {
     const newQuoteText = document.getElementById('newQuoteText').value;
     const newQuoteCategory = document.getElementById('newQuoteCategory').value;
     if (newQuoteText && newQuoteCategory) {
