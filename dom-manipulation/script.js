@@ -9,15 +9,20 @@ function showRandomQuote() {
     } else {
         quoteDisplay.innerHTML = "<p>No quotes available</p>";
     }
-}
-function createAddQuoteForm() {
+}function createAddQuoteForm() {
     const newQuoteText = document.getElementById('newQuoteText').value;
     const newQuoteCategory = document.getElementById('newQuoteCategory').value;
     if (newQuoteText && newQuoteCategory) {
         quotes.push({ text: newQuoteText, category: newQuoteCategory });
         saveQuotes();
         const quoteDisplay = document.getElementById('quoteDisplay');
-        quoteDisplay.innerHTML = `<p>${newQuoteText}</p><p>${newQuoteCategory}</p>`;
+        const quoteTextElement = document.createElement('p');
+        quoteTextElement.textContent = newQuoteText;
+        const quoteCategoryElement = document.createElement('p');
+        quoteCategoryElement.textContent = newQuoteCategory;
+        quoteDisplay.innerHTML = '';
+        quoteDisplay.appendChild(quoteTextElement);
+        quoteDisplay.appendChild(quoteCategoryElement);
         document.getElementById('newQuoteText').value = '';
         document.getElementById('newQuoteCategory').value = '';
         alert('New quote added successfully!');
